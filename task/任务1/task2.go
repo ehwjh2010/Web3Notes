@@ -34,9 +34,7 @@ func (s *Stack) IsEmpty() bool {
 }
 
 func NewStack() *Stack {
-	return &Stack{
-		data: make([]int32, 0),
-	}
+	return &Stack{data: make([]int32, 0)}
 }
 
 /*
