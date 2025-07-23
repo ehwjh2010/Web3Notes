@@ -1,0 +1,384 @@
+### 区块链操作命令
+- init : 初始化创世区块和网络定义
+  - `<genesis.json>` 是你提供的创世文件路径，必须指定
+  - `--cache.preimages`  可选参数，启用预图像缓存。存储前缀树Key(哈希值)对应的原始数据，用于调试和状态验证
+  - `--override.osaka`     可选参数，强制启用 Osaka 网络升级特性（测试用途）
+  - `--override.verkle`     可选参数，强制启用 Verkle 树存储结构（实验性特性）
+  - `--datadir` 可选参数，数据存储目录
+  - `--remotedb` 可选参数，远程数据库URL
+  - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+  - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+  - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+  - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+  - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+- import: 导入/导出区块链数据
+  - `<filename> (<filename 2> ...)` 必须指定倒入的文件
+  - `--gcmode` ：垃圾回收模式配置。(可选值："full" 或 "archive")
+  - `--snapshot `：启用快照功能。默认启用
+  - `--cache` ：分配给内部缓存的内存大小（单位：MB）,（默认值为主网全节点 4096MB，轻节点模式为 128MB）
+  - `--cache.database` ：数据库 I/O 的缓存内存比例（以百分比表示）
+  - `--cache.trie` ：用于状态树（trie）缓存的内存占比（以总缓存为基准）（默认值：全节点模式为 15%，归档节点模式为 30%）
+  - `--cache.gc` ：用于状态树（trie）修剪缓存的内存占比（以总缓存为基准）（默认值：全节点模式为 25%，归档节点模式为 0%）
+  - `--cache.snapshot` ：用于快照缓存的内存占比（以总缓存为基准）（默认值：全节点模式为 10%，归档节点模式为 20%）
+  - `--cache.noprefetch` ：在区块导入过程中禁用启发式状态预取（减少 CPU 和磁盘 I/O，但会增加等待数据的时间）
+  - `--cache.preimages` ：启用哈希预图像缓存。
+  - `--no-compaction` ：导入区块后禁用数据库压缩（compaction）
+  - `--vm.trace` ：启用VM执行跟踪。
+  - `--vm.trace.jsonconfig` ：VM跟踪的JSON配置文件路径。
+  - `--history.transactions` ：维护交易索引的最近区块数量（默认约为一年区块数，0 表示为整个链维护）,该参数控制节点为多少最近的区块建立交易索引，以便快速查询这些区块内的交易。
+  - `--log.history` ：维护日志搜索索引的最近区块数量（默认约为一年区块数，0 表示为整个链维护）
+  - `--log.nohistory` ：禁用日志搜索索引
+  - `--log.export-checkpoints` ：以 Go 源代码文件格式导出检查点数据到文件, “检查点”（checkpoints）是节点同步或状态管理中的关键数据点，用于加快同步速度或保证数据一致性
+  - `--state.history` ：保留状态历史的最近区块数量，仅在 state.scheme=path 模式下生效
+（默认值为 90,000 个区块，设置为 0 表示保留整个链的状态历史）
+  - `--datadir` 可选参数，数据存储目录
+  - `--remotedb` 可选参数，远程数据库URL
+  - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+  - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+  - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+  - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+  - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+- export : 导出区块链数据
+   - `<filename> [<blockNumFirst> <blockNumLast>]`必须指定导出文件，可指定从哪个区块到哪个区块
+   - `--cache` ：分配给内部缓存的内存大小（单位：MB）,（默认值为主网全节点 4096MB，轻节点模式为 128MB）
+   - `--datadir` 可选参数，数据存储目录
+   - `--remotedb` 可选参数，远程数据库URL
+   - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+   - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+   - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+   - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+   - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+- import-history : 导入历史数据（Era归档）
+  - `<dir>` ：导入 Era 归档文件的目录路径
+  - `--history.transactions` ：维护交易索引的最近区块数量（默认约为一年区块数，0 表示为整个链维护）,该参数控制节点为多少最近的区块建立交易索引，以便快速查询这些区块内的交易。
+  - `--datadir` 可选参数，数据存储目录
+  - `--remotedb` 可选参数，远程数据库URL
+  - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+  - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+  - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+  - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+  - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - `--mainnet`: 是否为以太坊主网
+  - `--sepolia`: 是否为sepolia测试网络
+  - `--holesky`：是否为holesky的测试网络
+  - `--hoodi`： 是否为hoodi的测试网络
+- export-history : 导出历史数据（Era归档）
+  - `<dir> <first> <last>`：导出 Era 归档文件的目标目录路径，导出的起始区块编号，导出的结束区块编号
+  - `--datadir` 可选参数，数据存储目录
+  - `--remotedb` 可选参数，远程数据库URL
+  - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+  - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+  - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+  - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+  - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+- removedb : 删除区块链和状态数据库
+  - `--remove.state`: 删除状态数据
+  - `remove.chain`: 删除区块链数据
+  - `--datadir` 可选参数，数据存储目录
+  - `--remotedb` 可选参数，远程数据库URL
+  - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+  - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+  - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+  - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+  - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+- dump : 导出指定区块数据
+  - `--cache` ：分配给内部缓存的内存大小（单位：MB）,（默认值为主网全节点 4096MB，轻节点模式为 128MB）
+  - `--iterative`: 以换行符分隔的方式，逐条输出 JSON 数据
+  - `--nocode`: 排除合约代码（以减少数据库查找）
+  - `--nostorage`: 不存储数据
+  - `--incompletes`: 包含那些没有地址（缺少 preimage）的账户
+  - `--start`：开始位置，哈希值或地址
+  - `--limit`：最大数量(0代表没有限制)
+  - `--datadir` 可选参数，数据存储目录
+  - `--remotedb` 可选参数，远程数据库URL
+  - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+  - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+  - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+  - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+  - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+- dumpgenesis : 导出创世区块的JSON配置到标准输出
+  - `--datadir` 可选参数，数据存储目录
+  - `--mainnet`: 是否为以太坊主网
+  - `--sepolia`: 是否为sepolia测试网络
+  - `--holesky`：是否为holesky的测试网络
+  - `--hoodi`： 是否为hoodi的测试网络
+- prune-history : 修剪区块链历史数据
+  - `--datadir` 可选参数，数据存储目录
+  - `--remotedb` 可选参数，远程数据库URL
+  - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+  - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+  - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+  - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+  - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+- download-era : 从 HTTP 端点获取 Era1 文件（合并前的历史数据）
+  - `--datadir` 可选参数，数据存储目录
+  - `--remotedb` 可选参数，远程数据库URL
+  - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+  - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+  - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+  - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+  - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - `--mainnet`: 是否为以太坊主网
+  - `--sepolia`: 是否为sepolia测试网络
+  - `--holesky`：是否为holesky的测试网络
+  - `--hoodi`： 是否为hoodi的测试网络
+  - `--block`: 区块编号，也可通过<start>-<end>设置
+  - `--epoch`: Epoch 编号（也可以是一个范围，如 <起始>-<结束>）
+  - `--all`: 下载所有era1 文件
+  - `--server`: Era1 服务器的 URL 地址
+
+### 账户管理命令
+- account : 管理以太坊账户（创建、导入、列出、更新等）
+  - list ：打印现有账户的摘要信息
+    - `--datadir`: 可选参数，数据存储目录
+    - `--keystore`: keystore目录
+  - new ：创建一个新账户，会提示设置密码（也可通过 --password 参数指定密码文件）
+    - `--datadir`: 可选参数，数据存储目录
+    - `--keystore`: keystore目录
+    - `--password`: 密码文件地址
+    - `--lightkdf`: 降低密钥派生函数（KDF）对内存和 CPU 的使用，但会牺牲一定的安全强度
+  - update ：更新现有账户，支持迁移旧格式账户或修改账户密码（仅交互式模式支持改密码）
+    - `--datadir`: 可选参数，数据存储目录
+    - `--keystore`: keystore目录
+    - `--lightkdf`: 降低密钥派生函数（KDF）对内存和 CPU 的使用，但会牺牲一定的安全强度
+  - import ：将私钥文件导入并创建新账户，私钥需为未加密的十六进制格式
+    - `--datadir`: 可选参数，数据存储目录
+    - `--keystore`: keystore目录
+    - `--password`: 密码文件地址
+    - `--lightkdf`: 降低密钥派生函数（KDF）对内存和 CPU 的使用，但会牺牲一定的安全强度
+
+- wallet : 管理预售钱包（如导入预售钱包文件）
+  - import ：用于导入以太坊预售钱包。该子命令需要指定钱包文件路径作为参数，
+    - `--datadir`: 可选参数，数据存储目录
+    - `--keystore`: keystore目录
+    - `--password`: 密码文件地址
+    - `--lightkdf`: 降低密钥派生函数（KDF）对内存和 CPU 的使用，但会牺牲一定的安全强度### 交互与控制台命令
+- console : 启动交互式JavaScript控制台
+- attach : 连接到远程节点控制台
+  - `--datadir`: 可选参数，数据存储目录
+  - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - `--jspath`: `loadScript` 的 JavaScript 根路径
+  - `--exec`: 执行 JavaScript 
+  - `--preload`: 在控制台中预加载的 JavaScript 文件列表（以逗号分隔）, 这是 Geth 控制台的一个参数，允许你在打开交互式 JavaScript 控制台时，自动加载指定的 .js 文件。
+
+### 数据库操作命令
+- db : 低级数据库操作（如 db inspect 、 db compact 、 db get 等）
+  - inspect: 检查数据库中每种数据类型的存储大小
+    - `<prefix> <start>`: prefix为前缀，start为区块遍号，通过这俩来筛选数据
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - stats : 打印 leveldb 统计信息
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - compact : 压缩 leveldb 数据库（警告：可能需要很长时间）
+    - `--cache` ：分配给内部缓存的内存大小（单位：MB）,（默认值为主网全节点 4096MB，轻节点模式为 128MB）
+    - `--cache.database` ：数据库 I/O 的缓存内存比例（以百分比表示）
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。  
+  - get : 显示数据库键的值
+    - `<hex-encoded key>`: key
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - delete : 删除数据库键（警告：可能损坏数据库）
+    - `<hex-encoded key>`: key
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - put : 设置数据库键的值（警告：可能损坏数据库）
+    - `<hex-encoded key> <hex-encoded value>`: key value
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - dumptrie : 显示给定存储 trie 的存储键/值，通过提供状态根、账户哈希和存储 trie 根，可以精确定位到特定账户的存储数据，并可通过可选参数限制查询范围和结果数量。
+    - `<hex-encoded state root> <hex-encoded account hash> <hex-encoded storage trie root> <hex-encoded start (optional)> <int max elements (optional)>`
+      - `<hex-encoded state root>`（必选）: 十六进制编码的状态根哈希，用于标识区块链的特定状态。
+      - `<hex-encoded account hash>` （必选）:十六进制编码的账户哈希，指定要查询的账户。
+      - `<hex-encoded storage trie root>` （必选）:十六进制编码的存储 trie 根哈希，指向该账户的存储数据结构。
+      - `<hex-encoded start>` （可选）: 十六进制编码的起始键，用于指定从哪个键开始迭代存储 trie, 不指定时从 trie 的起始位置开始迭代。
+      - `<int max elements>` （可选）:整数类型，限制返回的存储键值对数量。不指定时返回所有匹配的键值对。
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - freezer-index : 导出指定 Freezer 表的索引内容
+    - `<freezer-type> <table-type> <start (int)> <end (int)>`
+      - `<freezer-type>` （必选）
+        - 指定要查看的 freezer 类型，通常是 chain （链数据）或 state （状态数据）等。
+      - `<table-type>` （必选）
+        - 指定要查看的表类型，例如 headers （区块头）、 bodies （区块体）、 receipts （交易收据）等。
+      - `<start (int)>`（必选）
+        - 整数类型，指定要查看的起始索引位置
+      - `<end (int)>` （必选）
+      - 整数类型，指定要查看的结束索引位置（包含在内）
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - import : 从 RLP 中 向 leveldb 导入数据
+    - `<dumpfile> <start (optional)`
+      - `<dumpfile>` (必选): dumpfile, 指定包含要导入的 RLP 编码数据的文件路径
+      - `<start (optional)>` （可选）：指定导入的起始位置参数。
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - export : 将链数据导出到 RLP 转储（如果文件名有 .gz 后缀，将使用 gzip 压缩）
+    - `<type> <dumpfile>` :
+      - `<type>` （必选）：指定要导出的链数据类型。
+      - `<dumpfile>` （必选）：指定导出文件的路径，如果文件后缀为 .gz ，则会使用 gzip 压缩。
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - metadata : 显示有关链状态的元数据
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。 
+  - check-state-content : 验证状态数据在加密学上是否正确
+    - `<start (optional)>`: 开始位置
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - inspect-history : 检查块范围内的状态历史
+    - `<address> [OPTIONAL <storage-slot>]`:
+      - `<address>` （必选）：指定要检查状态历史的地址
+      - `[OPTIONAL <storage-slot>]` （可选）：指定要检查的存储槽位。
+    - `--start`:起始区块编号，0代表从最早
+    - `--end`: 截止区块编号，0代表从最后
+    - `--raw`: 显示解码后的原始值，否则就显示rlp编码后的值
+### 杂项命令
+- version : 显示版本信息
+- version-check : 检查Geth安全漏洞
+  - `<versionstring (optional)>`: 可选参数，用于手动指定要检查的版本
+  - `--check.url `：指定检查漏洞时使用的 URL, 默认值为：https://geth.ethereum.org/docs/vulnerabilities/vulnerabilities.json
+  - `--check.version`: 指定要检查的版本。默认值为当前运行的 Geth 客户端版本。
+- license : 显示许可证信息
+- dumpconfig : 导出配置文件
+- snapshot : 快照相关操作
+  - `<root>`: 根节点
+  - `--bloomfilter.size`: 用于修剪（pruning）操作分配给布隆过滤器（bloom-filter）的内存大小（单位为 MB）
+  - `--mainnet`: 是否为以太坊主网
+  - `--sepolia`: 是否为sepolia测试网络
+  - `--holesky`：是否为holesky的测试网络
+  - `--hoodi`： 是否为hoodi的测试网络
+  - `--datadir` 可选参数，数据存储目录
+  - `--remotedb` 可选参数，远程数据库URL
+  - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+  - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+  - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+  - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+  - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+- verkle : Verkle树相关操作
+  - verify: 验证将 MPT（Merkle Patricia Tree）转换为 Verkle Tree 的过程是否正确。
+    - `<root>`: 根节点
+    - `--mainnet`: 是否为以太坊主网
+    - `--sepolia`: 是否为sepolia测试网络
+    - `--holesky`：是否为holesky的测试网络
+    - `--hoodi`： 是否为hoodi的测试网络
+    - `--datadir` 可选参数，数据存储目录
+    - `--remotedb` 可选参数，远程数据库URL
+    - `--db.engine` 可选参数，数据库引擎，必须是pebble 或 leveldb
+    - `--datadir.ancient` 可选参数，“Ancient data”的根目录（默认在 chaindata 目录内）
+    - `--datadir.era` 可选参数，Era1 历史数据的根目录（默认位置为 ancient/chain 目录内）
+    - `--state.scheme` 可选参数，用于存储以太坊状态的方案：可选 'hash' 或 'path'
+    - `--header` 可选参数，在使用 --remotedb 或 geth attach 控制台时，向 RPC 服务器传递自定义请求头。该参数可以重复使用多次。
+  - dump: 将 Verkle 树导出为 DOT 文件格式。
+    - `<root>` （必选）：指定 Verkle 树的根
+    - `<key1> [<key 2> ...]` （必选及可选）：指定一个或多个要转储的键
+- show-deprecated : 显示已弃用的标志和命令
